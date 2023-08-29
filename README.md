@@ -1,19 +1,6 @@
-# Vendure plugin template
+# Vendure plugin Seller Verification
 
-1. Copy this directory and rename to `vendure-plugin-YOUR-PLUGIN-NAME`
-2. Update the `name` and `description` field in `package.json`
-4. Update this Readme: What does the plugin do? How can someone use your plugin in their project?
-5. Run `yarn` to install the dependencies
-6. Run `yarn start` to start the server
-
-The admin is now available at `http://localhost:3050/admin`. Login with _superadmin/superadmin_
-
-The shop GraphQL `http://localhost:3050/shop-api`. Here you can test your custom GraphQL query:
-```graphql
-{
-  exampleQuery
-}
-```
+Plugin allows superadmin to enable/disable sellers. This can be used to verify sellers if sellers need to be verified in some capacity before being able to post items for sale.
 
 ## Testing
 
