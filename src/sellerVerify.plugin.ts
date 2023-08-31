@@ -25,6 +25,7 @@ import path from "path";
 				},
 			],
 		});
+
 		return config;
 	},
 })

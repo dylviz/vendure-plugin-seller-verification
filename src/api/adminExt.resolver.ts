@@ -35,17 +35,3 @@ export class AdminExtResolver {
 		);
 	}
 }
-
-// @Resolver("Seller")
-// export class VerifySellerResolver {
-// 	constructor(private sellerVerifyService: SellerVerifyService) {}
-
-// 	@ResolveField()
-// 	@Allow(Permission.SuperAdmin)
-// 	async isVerified(
-// 		@Ctx() ctx: RequestContext,
-// 		@Parent() seller: Seller
-// 	): Promise<boolean> {
-// 		return this.sellerVerifyService.isVerified(ctx, seller);
-// 	}
-// }

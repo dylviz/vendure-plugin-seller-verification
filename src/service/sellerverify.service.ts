@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import { RequestContext } from "@vendure/core";
+import { RequestContext, RoleService } from "@vendure/core";
 import { SellerService } from "@vendure/core/dist/service/services/seller.service";
 import { Seller } from "@vendure/core/dist/entity/seller/seller.entity";
 import { SetSellerVerificationStatusInput } from "../types";
@@ -13,7 +13,10 @@ declare module "@vendure/core/dist/entity/custom-entity-fields" {
 
 @Injectable()
 export class SellerVerifyService {
-	constructor(private sellerService: SellerService) {}
+	constructor(
+		private sellerService: SellerService,
+		private roleService: RoleService
+	) {}
 
 	/**
 	 * Update the seller verification status
