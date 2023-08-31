@@ -15,10 +15,11 @@ import { map, filter } from "rxjs/operators";
 
 import { SET_SELLER_VERIFICATION } from "./verify-seller.graphql";
 import {
+	SetSellerVerificationStatusDocument,
 	SetSellerVerificationStatusInput,
 	SetSellerVerificationStatusMutation,
 	SetSellerVerificationStatusMutationVariables,
-} from "../../../generated/generated-admin-types";
+} from "../../generated-admin-types";
 
 @Component({
 	selector: "vdr-store-credit-detail",
@@ -27,7 +28,10 @@ import {
 	changeDetection: ChangeDetectionStrategy.Default,
 })
 export class VerifySellerComponent
-	extends TypedBaseDetailComponent<any, never>
+	extends TypedBaseDetailComponent<
+		typeof SetSellerVerificationStatusDocument,
+		keyof SetSellerVerificationStatusMutation
+	>
 	implements OnInit, OnDestroy
 {
 	detailForm: FormGroup;
@@ -46,6 +50,7 @@ export class VerifySellerComponent
 	}
 
 	ngOnInit() {
+		//I think this is causing a small error
 		if (this.router.url != "/extensions/store-credit/create") {
 			this.which = false;
 			this.init();
@@ -62,16 +67,16 @@ export class VerifySellerComponent
 		this.saveChanges()
 			.pipe(filter((result) => !!result))
 			.subscribe({
-				next: () => {
+				next: (response) => {
 					this.detailForm.markAsPristine();
 					this.changeDetector.markForCheck();
 					this.notificationService.success("common.notify-update-success", {
-						entity: "StoreCredit",
+						entity: "Seller",
 					});
 				},
 				error: () => {
 					this.notificationService.error("common.notify-update-error", {
-						entity: "StoreCredit",
+						entity: "Seller",
 					});
 				},
 			});
@@ -81,13 +86,9 @@ export class VerifySellerComponent
 		if (this.detailForm.dirty) {
 			const formValue = this.detailForm.value;
 			const input: SetSellerVerificationStatusInput = {
-				sellerId: formValue.value,
-				isVerified: true,
+				sellerId: formValue.key,
+				isVerified: JSON.parse(formValue.value),
 			};
-
-			this.route.params.forEach((val) => {
-				input.sellerId = val.id;
-			});
 
 			return this.dataService
 				.mutate<

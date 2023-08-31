@@ -23,4 +23,4 @@ import { SharedModule, addNavMenuSection } from "@vendure/admin-ui/core";
 		),
 	],
 })
-export class StoreCreditExtensionModule {}
+export class VerifySellerExtensionModule {}

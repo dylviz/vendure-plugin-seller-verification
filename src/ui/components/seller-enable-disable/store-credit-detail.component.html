@@ -1,67 +1,48 @@
 <vdr-page-header>
-  <vdr-page-title></vdr-page-title>
+	<vdr-page-title></vdr-page-title>
 </vdr-page-header>
 
 <vdr-page-body>
-  <vdr-page-block>
-    <vdr-action-bar>
-      <vdr-ab-left></vdr-ab-left>
-      <vdr-ab-right>
-        <button
-          class="button primary"
-          *ngIf="which; else updateButton"
-          (click)="create()"
-          [disabled]="detailForm.pristine || detailForm.invalid"
-        >
-          {{ 'common.create' | translate }}
-        </button>
-        <ng-template #updateButton>
-          <button
-            class="btn btn-primary"
-            (click)="update()"
-            [disabled]="detailForm.pristine || detailForm.invalid"
-          >
-            {{ 'common.update' | translate }}
-          </button>
-        </ng-template>
-      </vdr-ab-right>
-    </vdr-action-bar>
-  </vdr-page-block>
+	<form class="form" [formGroup]="detailForm">
+		<!-- <vdr-page-detail-layout>
+			<vdr-page-detail-sidebar>
+				<vdr-card *ngIf="entity$ | async as entity">
+					<vdr-page-entity-info [entity]="entity" />
+				</vdr-card>
+			</vdr-page-detail-sidebar>
+		</vdr-page-detail-layout> -->
 
-  <form class="form" [formGroup]="detailForm">
-    <vdr-page-detail-layout>
-      <vdr-page-detail-sidebar>
-        <vdr-card *ngIf="entity$ | async as entity">
-          <vdr-page-entity-info [entity]="entity" />
-        </vdr-card>
-      </vdr-page-detail-sidebar>
-    </vdr-page-detail-layout>
+		<vdr-page-block>
+			<vdr-card>
+				<div class="form-grid">
+					<vdr-form-field label="Seller ID" for="key">
+						<input id="key" formControlName="key" />
+					</vdr-form-field>
 
-    <vdr-page-block>
-      <vdr-card>
-        <div class="form-grid">
-          <vdr-form-field label="Key" for="key">
-            <div class="button-container">
-              <button class="button" (click)="generateStoreCreditKey()">
-                Generate Key
-              </button>
-            </div>
+					<vdr-form-field label="Seller Status" for="value">
+						<select
+							id="value"
+							formControlName="value"
+							[disabled]="!'UpdateSettings'"
+						>
+							<option value="true">Enable</option>
+							<option value="false">Disable</option>
+						</select>
+					</vdr-form-field>
 
-            <vdr-form-field>
-              <input id="key" formControlName="key" [value]="storeCreditKey" />
-            </vdr-form-field>
-          </vdr-form-field>
-
-          <vdr-form-field label="Value" for="value">
-            <input
-              type="number"
-              id="value"
-              formControlName="value"
-              [readonly]="!'UpdateSettings'"
-            />
-          </vdr-form-field>
-        </div>
-      </vdr-card>
-    </vdr-page-block>
-  </form>
+					<div class="button-container">
+						<button
+							class="button"
+							(click)="update()"
+							[disabled]="
+								!detailForm.get('key')?.valid || !detailForm.get('value')?.valid
+							"
+						>
+							Update Seller Status
+						</button>
+					</div>
+				</div>
+			</vdr-card>
+		</vdr-page-block>
+	</form>
 </vdr-page-body>
