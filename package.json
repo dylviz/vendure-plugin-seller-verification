@@ -1,6 +1,6 @@
 {
 	"name": "@avendure/vendure-plugin-seller-verification",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"description": "Vendure plugin to allow SuperAdmin to enable/disable sellers from posting items to the marketplace.",
 	"author": "BrainFried",
 	"repository": "https://github.com/dylviz/vendure-plugin-seller-verification",
@@ -38,5 +38,8 @@
 		"ts-jest": "29.0.5",
 		"ts-node": "10.9.1",
 		"typescript": "4.9.5"
+	},
+	"dependencies": {
+		"@angular/core": "^16.2.3"
 	}
 }
