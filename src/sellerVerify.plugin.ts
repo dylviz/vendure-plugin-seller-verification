@@ -29,20 +29,20 @@ import path from "path";
 	},
 })
 export class SellerVerifyPlugin {
-	// static uiExtensions: AdminUiExtension = {
-	// 	extensionPath: path.join(__dirname, "ui"),
-	// 	ngModules: [
-	// 		{
-	// 			type: "lazy",
-	// 			route: "store-credit",
-	// 			ngModuleFileName: "store-credit-ui-lazy.module.ts",
-	// 			ngModuleName: "VerifySellerUIModule",
-	// 		},
-	// 		{
-	// 			type: "shared",
-	// 			ngModuleFileName: "store-credit-ui-extension.module.ts",
-	// 			ngModuleName: "VerifySellerExtensionModule",
-	// 		},
-	// 	],
-	// };
+	static uiExtensions: AdminUiExtension = {
+		extensionPath: path.join(__dirname, "ui"),
+		ngModules: [
+			{
+				type: "lazy",
+				route: "verify-seller",
+				ngModuleFileName: "verify-seller-ui-lazy.module.ts",
+				ngModuleName: "VerifySellerUIModule",
+			},
+			{
+				type: "shared",
+				ngModuleFileName: "verify-seller-ui-extension.module.ts",
+				ngModuleName: "VerifySellerExtensionModule",
+			},
+		],
+	};
 }

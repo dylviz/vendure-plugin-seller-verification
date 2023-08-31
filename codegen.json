@@ -1,0 +1,36 @@
+{
+	"overwrite": true,
+	"config": {
+		"strict": true,
+		"namingConvention": {
+			"typeNames": "pascal-case#pascalCase",
+			"enumValues": "keep"
+		},
+		"scalars": {
+			"ID": "string | number",
+			"Money": "number"
+		},
+		"maybeValue": "T"
+	},
+	"generates": {
+		"src/generated/generated-admin-types.ts": {
+			"schema": "http://localhost:3001/admin-api",
+			"documents": "src/ui/**/**/*.graphql.ts",
+			"plugins": [
+				{
+					"add": {
+						"content": "/* eslint-disable */"
+					}
+				},
+				"typescript",
+				"typescript-operations",
+				"typed-document-node"
+			],
+			"config": {
+				"scalars": {
+					"ID": "string"
+				}
+			}
+		}
+	}
+}

@@ -1,36 +1,42 @@
 {
-  "name": "vendure-plugin-template",
-  "version": "1.0.0",
-  "description": "Plugin template",
-  "author": "Martijn van de Brug <martijn@pinelab.studio>",
-  "repository": "https://github.com/vendure-ecommerce/plugin-template",
-  "license": "MIT",
-  "private": false,
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "README.md"
-  ],
-  "scripts": {
-    "start": "yarn ts-node test/dev-server.ts",
-    "build": "rimraf dist && tsc",
-    "test": "jest --preset=\"ts-jest\""
-  },
-  "devDependencies": {
-    "@types/jest": "29.4.0",
-    "@vendure/admin-ui-plugin": "1.9.3",
-    "@vendure/asset-server-plugin": "1.9.3",
-    "@vendure/core": "1.9.3",
-    "@vendure/testing": "1.9.3",
-    "@vendure/ui-devkit": "1.9.3",
-    "jest": "29.4.3",
-    "rimraf": "^4.1.2",
-    "ts-jest": "29.0.5",
-    "ts-node": "10.9.1",
-    "typescript": "4.9.5"
-  }
+	"name": "@avendure/vendure-plugin-seller-verification",
+	"version": "1.0.0",
+	"description": "Vendure plugin to allow SuperAdmin to enable/disable sellers from posting items to the marketplace.",
+	"author": "BrainFried",
+	"repository": "https://github.com/dylviz/vendure-plugin-seller-verification",
+	"license": "MIT",
+	"private": false,
+	"engines": {
+		"node": ">=16.0.0"
+	},
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"files": [
+		"dist",
+		"README.md"
+	],
+	"scripts": {
+		"start": "yarn ts-node test/dev-server.ts",
+		"build": "rimraf dist && tsc",
+		"test": "jest --preset=\"ts-jest\"",
+		"gen": "graphql-codegen --config ./codegen.json"
+	},
+	"devDependencies": {
+		"@graphql-codegen/add": "^5.0.0",
+		"@graphql-codegen/cli": "^5.0.0",
+		"@graphql-codegen/typed-document-node": "^5.0.1",
+		"@graphql-codegen/typescript": "^4.0.1",
+		"@graphql-codegen/typescript-operations": "^4.0.1",
+		"@types/jest": "29.4.0",
+		"@vendure/admin-ui-plugin": "^2.0.6",
+		"@vendure/asset-server-plugin": "^2.0.6",
+		"@vendure/core": "^2.0.6",
+		"@vendure/testing": "^2.0.6",
+		"@vendure/ui-devkit": "^2.0.6",
+		"jest": "29.4.3",
+		"rimraf": "^4.1.2",
+		"ts-jest": "29.0.5",
+		"ts-node": "10.9.1",
+		"typescript": "4.9.5"
+	}
 }
