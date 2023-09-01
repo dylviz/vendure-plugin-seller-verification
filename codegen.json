@@ -13,7 +13,7 @@
 		"maybeValue": "T"
 	},
 	"generates": {
-		"src/generated/generated-admin-types.ts": {
+		"src/ui/components/generated-admin-types.ts": {
 			"schema": "http://localhost:3001/admin-api",
 			"documents": "src/ui/**/**/*.graphql.ts",
 			"plugins": [

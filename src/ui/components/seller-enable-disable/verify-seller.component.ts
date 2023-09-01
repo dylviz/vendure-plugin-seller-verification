@@ -23,8 +23,8 @@ import {
 
 @Component({
 	selector: "vdr-store-credit-detail",
-	templateUrl: "./store-credit-detail.component.html",
-	styleUrls: ["./store-credit-detail.component.scss"],
+	templateUrl: "./verify-seller.component.html",
+	styleUrls: ["./verify-seller.component.scss"],
 	changeDetection: ChangeDetectionStrategy.Default,
 })
 export class VerifySellerComponent
