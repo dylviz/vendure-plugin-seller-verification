@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateSellerInput } from '@vendure/common/lib/generated-types';
-import { ChannelService, Permission, RequestContext, RoleService } from '@vendure/core';
+import {
+  ChannelService,
+  Permission,
+  RequestContext,
+  RoleService,
+} from '@vendure/core';
 import { Seller } from '@vendure/core/dist/entity/seller/seller.entity';
 import { SellerService } from '@vendure/core/dist/service/services/seller.service';
 
@@ -17,7 +22,7 @@ export class SellerVerifyService {
   constructor(
     private sellerService: SellerService,
     private channelService: ChannelService,
-    private roleService: RoleService
+    private roleService: RoleService,
   ) {}
 
   /**
@@ -28,7 +33,7 @@ export class SellerVerifyService {
    */
   async setSellerVerificationStatus(
     ctx: RequestContext,
-    sellerIsVerified: SetSellerVerificationStatusInput
+    sellerIsVerified: SetSellerVerificationStatusInput,
   ): Promise<Seller> {
     const { sellerId, isVerified } = sellerIsVerified;
 
@@ -60,31 +65,59 @@ export class SellerVerifyService {
         },
       };
 
+      //Update permissions
+      let updatedPermissions: Permission[] = [];
+
+      const additionalPermissions: Permission[] = [
+        Permission.CreateCatalog,
+        Permission.ReadCatalog,
+        Permission.UpdateCatalog,
+        Permission.DeleteCatalog,
+        Permission.CreateAsset,
+        Permission.ReadAsset,
+        Permission.UpdateAsset,
+        Permission.DeleteAsset,
+      ];
+
+      // Append permissions if the condition is true
+      if (isVerified) {
+        updatedPermissions = [
+          ...roles.items[0].permissions,
+          ...additionalPermissions,
+        ];
+      } else {
+        // Remove permissions if the condition is false
+        updatedPermissions = roles.items[0].permissions.filter(
+          (permission) => !additionalPermissions.includes(permission),
+        );
+      }
+
       const updatedRole = {
         id: roleID,
-        permissions: [
-          Permission.CreateCatalog,
-          Permission.UpdateCatalog,
-          Permission.ReadCatalog,
-          Permission.DeleteCatalog,
-          Permission.CreateOrder,
-          Permission.ReadOrder,
-          Permission.UpdateOrder,
-          Permission.DeleteOrder,
-          Permission.ReadCustomer,
-          Permission.ReadPaymentMethod,
-          Permission.ReadShippingMethod,
-          Permission.ReadPromotion,
-          Permission.ReadCountry,
-          Permission.ReadZone,
-          Permission.CreateCustomer,
-          Permission.UpdateCustomer,
-          Permission.DeleteCustomer,
-          Permission.CreateTag,
-          Permission.ReadTag,
-          Permission.UpdateTag,
-          Permission.DeleteTag,
-        ],
+        permissions: updatedPermissions,
+        // [
+        // 	Permission.CreateCatalog,
+        // 	Permission.UpdateCatalog,
+        // 	Permission.ReadCatalog,
+        // 	Permission.DeleteCatalog,
+        // 	Permission.CreateOrder,
+        // 	Permission.ReadOrder,
+        // 	Permission.UpdateOrder,
+        // 	Permission.DeleteOrder,
+        // 	Permission.ReadCustomer,
+        // 	Permission.ReadPaymentMethod,
+        // 	Permission.ReadShippingMethod,
+        // 	Permission.ReadPromotion,
+        // 	Permission.ReadCountry,
+        // 	Permission.ReadZone,
+        // 	Permission.CreateCustomer,
+        // 	Permission.UpdateCustomer,
+        // 	Permission.DeleteCustomer,
+        // 	Permission.CreateTag,
+        // 	Permission.ReadTag,
+        // 	Permission.UpdateTag,
+        // 	Permission.DeleteTag,
+        // ],
       };
 
       await this.roleService.update(ctx, updatedRole);

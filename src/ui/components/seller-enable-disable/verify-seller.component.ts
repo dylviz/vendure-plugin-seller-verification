@@ -50,13 +50,14 @@ export class VerifySellerComponent
 	}
 
 	ngOnInit() {
+		this.init();
 		//I think this is causing a small error
-		if (this.router.url != "/extensions/store-credit/create") {
-			this.which = false;
-			this.init();
-		} else {
-			this.which = true;
-		}
+		// if (this.router.url != "/extensions/store-credit/create") {
+		// 	this.which = false;
+		// 	this.init();
+		// } else {
+		// 	this.which = true;
+		// }
 	}
 
 	ngOnDestroy() {

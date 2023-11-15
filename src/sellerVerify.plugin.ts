@@ -7,6 +7,7 @@ import path from "path";
 
 @VendurePlugin({
 	imports: [PluginCommonModule],
+	compatibility: ">0.0.0",
 	providers: [SellerVerifyService],
 	adminApiExtensions: {
 		resolvers: [AdminExtResolver],
