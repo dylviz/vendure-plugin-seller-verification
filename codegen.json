@@ -14,7 +14,7 @@
 	},
 	"generates": {
 		"src/ui/components/generated-admin-types.ts": {
-			"schema": "http://localhost:3001/admin-api",
+			"schema": "http://localhost:3050/admin-api",
 			"documents": "src/ui/**/**/*.graphql.ts",
 			"plugins": [
 				{
