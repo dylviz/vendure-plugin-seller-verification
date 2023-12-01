@@ -10,7 +10,16 @@ import { Seller } from '@vendure/core/dist/entity/seller/seller.entity';
 import { SellerService } from '@vendure/core/dist/service/services/seller.service';
 
 import { SetSellerVerificationStatusInput } from '../types';
-
+export const additionalPermissions: Permission[] = [
+  Permission.CreateCatalog,
+  Permission.ReadCatalog,
+  Permission.UpdateCatalog,
+  Permission.DeleteCatalog,
+  Permission.CreateAsset,
+  Permission.ReadAsset,
+  Permission.UpdateAsset,
+  Permission.DeleteAsset,
+];
 declare module '@vendure/core/dist/entity/custom-entity-fields' {
   interface CustomSellerFields {
     isVerified?: boolean;
@@ -68,16 +77,7 @@ export class SellerVerifyService {
       //Update permissions
       let updatedPermissions: Permission[] = [];
 
-      const additionalPermissions: Permission[] = [
-        Permission.CreateCatalog,
-        Permission.ReadCatalog,
-        Permission.UpdateCatalog,
-        Permission.DeleteCatalog,
-        Permission.CreateAsset,
-        Permission.ReadAsset,
-        Permission.UpdateAsset,
-        Permission.DeleteAsset,
-      ];
+      
 
       // Append permissions if the condition is true
       if (isVerified) {
