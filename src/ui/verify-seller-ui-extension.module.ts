@@ -1,5 +1,7 @@
 import { NgModule } from "@angular/core";
-import { SharedModule, addNavMenuSection } from "@vendure/admin-ui/core";
+import { SharedModule, addNavMenuSection, registerBulkAction } from "@vendure/admin-ui/core";
+import { disableOnClickCallBack, enableOnClickCallBack, isSuperAdmin } from "./helpers";
+
 
 @NgModule({
 	imports: [SharedModule],
@@ -21,6 +23,24 @@ import { SharedModule, addNavMenuSection } from "@vendure/admin-ui/core";
 			// Add this section before the "settings" section
 			"settings"
 		),
+		registerBulkAction({
+			location: 'seller-list',
+			label: 'Enable Selected Seller(s)',
+			icon: 'check',
+			isVisible: ({ injector }) => isSuperAdmin(injector),
+			onClick: ({injector, selection}) => {
+				enableOnClickCallBack(injector, selection);
+			},
+		}),
+		registerBulkAction({
+			location: 'seller-list',
+			label: 'Disable Selected Seller(s)',
+			icon: 'times',
+			isVisible: ({ injector }) => isSuperAdmin(injector),
+			onClick: ({injector, selection}) => {
+				disableOnClickCallBack(injector, selection);
+			},
+		}),
 	],
 })
 export class VerifySellerExtensionModule {}

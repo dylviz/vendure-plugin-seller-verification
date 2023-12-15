@@ -5,9 +5,18 @@ export const adminSchema = gql`
 		sellerId: ID!
 		isVerified: Boolean!
 	}
+
+	input SetBulkSellerVerificationStatusInput {
+		sellerIds: [ID!]!
+		areVerified: Boolean!
+	}
 	extend type Mutation {
 		setSellerVerificationStatus(
 			input: SetSellerVerificationStatusInput!
-		): Seller!
+		): Seller
+
+		setBulkSellerVerificationStatus(
+			input: SetBulkSellerVerificationStatusInput!
+		): Success
 	}
 `;

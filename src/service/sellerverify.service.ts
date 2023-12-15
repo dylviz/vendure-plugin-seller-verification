@@ -2,14 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { UpdateSellerInput } from '@vendure/common/lib/generated-types';
 import {
   ChannelService,
+  ID,
   Permission,
   RequestContext,
   RoleService,
 } from '@vendure/core';
 import { Seller } from '@vendure/core/dist/entity/seller/seller.entity';
 import { SellerService } from '@vendure/core/dist/service/services/seller.service';
+import {SUPER_ADMIN_ROLE_CODE} from '@vendure/common/lib/shared-constants';
 
-import { SetSellerVerificationStatusInput } from '../types';
+import { SetBulkSellerVerificationStatusInput, SetSellerVerificationStatusInput } from '../types';
+import { Success } from '../ui/generated-admin-types';
 export const additionalPermissions: Permission[] = [
   Permission.CreateCatalog,
   Permission.ReadCatalog,
@@ -43,9 +46,8 @@ export class SellerVerifyService {
   async setSellerVerificationStatus(
     ctx: RequestContext,
     sellerIsVerified: SetSellerVerificationStatusInput,
-  ): Promise<Seller> {
+  ): Promise<Seller | undefined> {
     const { sellerId, isVerified } = sellerIsVerified;
-
     /**
      * Get seller id
      * Get channels of seller
@@ -63,14 +65,14 @@ export class SellerVerifyService {
         code: { eq: `${channels.items[0]?.code}-admin` },
       },
     });
-    const roleID = roles.items[0]?.id;
+    // const roleID = roles.items[0]?.id;
 
-    if (seller && roles) {
+    if (seller && roles.totalItems) {
       const updatedSeller: UpdateSellerInput = {
         id: seller.id,
         name: seller.name,
         customFields: {
-          isVerified: isVerified,
+          isVerified,
         },
       };
 
@@ -79,21 +81,25 @@ export class SellerVerifyService {
 
       
 
+      const nonSuperadminRole= roles.items.find((r)=> r.code !== SUPER_ADMIN_ROLE_CODE)
+      if(!nonSuperadminRole){
+        return;
+      }
       // Append permissions if the condition is true
       if (isVerified) {
         updatedPermissions = [
-          ...roles.items[0].permissions,
+          ...(nonSuperadminRole?.permissions??[]),
           ...additionalPermissions,
         ];
       } else {
         // Remove permissions if the condition is false
-        updatedPermissions = roles.items[0].permissions.filter(
+        updatedPermissions = nonSuperadminRole.permissions.filter(
           (permission) => !additionalPermissions.includes(permission),
         );
       }
 
       const updatedRole = {
-        id: roleID,
+        id: nonSuperadminRole.id,
         permissions: updatedPermissions,
         // [
         // 	Permission.CreateCatalog,
@@ -119,12 +125,20 @@ export class SellerVerifyService {
         // 	Permission.DeleteTag,
         // ],
       };
-
       await this.roleService.update(ctx, updatedRole);
 
       return this.sellerService.update(ctx, updatedSeller);
     }
+  }
 
-    return {} as Seller;
+  async setBulkSellerVerificationStatus(
+    ctx: RequestContext, 
+    input: SetBulkSellerVerificationStatusInput
+  ):Promise<Success>{
+    await Promise.all(input.sellerIds.map((id)=> this.setSellerVerificationStatus(ctx,{
+      isVerified: input.areVerified,
+      sellerId: id
+    })))
+    return {success: true}
   }
 }
