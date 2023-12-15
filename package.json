@@ -2,7 +2,7 @@
 	"name": "@avendure/vendure-plugin-seller-verification",
 	"version": "1.0.8",
 	"description": "Vendure plugin to allow SuperAdmin to enable/disable sellers from posting items to the marketplace.",
-	"author": "BrainFried",
+	"author": "",
 	"repository": "https://github.com/avendure/VendurePlugin-seller-verification",
 	"license": "MIT",
 	"private": false,
