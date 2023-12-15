@@ -17,7 +17,7 @@
 	],
 	"scripts": {
 		"start": "yarn ts-node test/dev-server.ts",
-		"build": "rimraf dist && tsc",
+		"build": "rimraf dist && tsc && cp -r src/ui dist/",
 		"test": "vitest run",
 		"gen": "graphql-codegen --config ./codegen.json"
 	},
