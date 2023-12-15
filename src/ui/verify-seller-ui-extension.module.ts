@@ -1,7 +1,14 @@
 import { NgModule } from "@angular/core";
-import { SharedModule, addNavMenuSection, registerBulkAction } from "@vendure/admin-ui/core";
-import { disableOnClickCallBack, enableOnClickCallBack, isSuperAdmin } from "./helpers";
-
+import {
+	SharedModule,
+	addNavMenuSection,
+	registerBulkAction,
+} from "@vendure/admin-ui/core";
+import {
+	disableOnClickCallBack,
+	enableOnClickCallBack,
+	isSuperAdmin,
+} from "./helpers";
 
 @NgModule({
 	imports: [SharedModule],
@@ -24,20 +31,20 @@ import { disableOnClickCallBack, enableOnClickCallBack, isSuperAdmin } from "./h
 			"settings"
 		),
 		registerBulkAction({
-			location: 'seller-list',
-			label: 'Enable Selected Seller(s)',
-			icon: 'check',
+			location: "seller-list",
+			label: "Enable Selected Seller(s)",
+			icon: "check",
 			isVisible: ({ injector }) => isSuperAdmin(injector),
-			onClick: ({injector, selection}) => {
+			onClick: ({ injector, selection }) => {
 				enableOnClickCallBack(injector, selection);
 			},
 		}),
 		registerBulkAction({
-			location: 'seller-list',
-			label: 'Disable Selected Seller(s)',
-			icon: 'times',
+			location: "seller-list",
+			label: "Disable Selected Seller(s)",
+			icon: "times",
 			isVisible: ({ injector }) => isSuperAdmin(injector),
-			onClick: ({injector, selection}) => {
+			onClick: ({ injector, selection }) => {
 				disableOnClickCallBack(injector, selection);
 			},
 		}),
