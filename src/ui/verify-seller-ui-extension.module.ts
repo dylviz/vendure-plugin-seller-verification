@@ -3,12 +3,14 @@ import {
 	SharedModule,
 	addNavMenuSection,
 	registerBulkAction,
+	registerDataTableComponent
 } from "@vendure/admin-ui/core";
 import {
 	disableOnClickCallBack,
 	enableOnClickCallBack,
 	isSuperAdmin,
 } from "./helpers";
+import { SellerInformationCellComponent } from "./components/seller-information-cell/seller-information-cell.component";
 
 @NgModule({
 	imports: [SharedModule],
@@ -47,6 +49,11 @@ import {
 			onClick: ({ injector, selection }) => {
 				disableOnClickCallBack(injector, selection);
 			},
+		}),
+		registerDataTableComponent({
+			component: SellerInformationCellComponent,
+			tableId: 'seller-list',
+			columnId: 'information',
 		}),
 	],
 })

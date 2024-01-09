@@ -1,6 +1,7 @@
 import {
 	Resolver,
 	Args,
+	Query,
 	Mutation,
 } from "@nestjs/graphql";
 import {
@@ -9,15 +10,20 @@ import {
 	RequestContext,
 	Ctx,
 	Transaction,
+	ID,
 } from "@vendure/core";
 import { SellerVerifyService } from "../service/sellerverify.service";
-import { SetBulkSellerVerificationStatusInput, SetSellerVerificationStatusInput } from "../types";
+import { SetBulkSellerVerificationStatusInput, SetSellerVerificationStatusInput, VerifySellerPluginOptions } from "../types";
 import { Seller } from "@vendure/core/dist/entity/seller/seller.entity";
 import { Success } from "../ui/generated-admin-types";
+import { Inject } from "@nestjs/common";
+import { SELLER_VERIFY_INIT_OPTIONS } from "../constants";
+import { SellerInformationField } from "src/ui/types";
 
 @Resolver()
 export class AdminExtResolver {
-	constructor(private sellerVerifyService: SellerVerifyService) {}
+	constructor(private sellerVerifyService: SellerVerifyService, 
+		@Inject(SELLER_VERIFY_INIT_OPTIONS) private config: VerifySellerPluginOptions) {}
 
 	@Transaction()
 	@Mutation()
@@ -43,5 +49,24 @@ export class AdminExtResolver {
 			ctx,
 			args.input
 		);
+	}
+
+
+	@Transaction()
+	@Mutation()
+	async requestVerification(@Ctx() ctx: RequestContext,
+	@Args() args: { sellerInformation: JSON, sellerId:ID }):Promise<Success>{
+		console.log(args,'-------------------')
+		return this.sellerVerifyService.requestVerification(
+			ctx,
+			args.sellerInformation,
+			args.sellerId
+		);
+	}
+
+	@Query()
+	@Allow(Permission.SuperAdmin)
+	getSellerInformationFields():SellerInformationField[]{
+		return this.config.fields;
 	}
 }

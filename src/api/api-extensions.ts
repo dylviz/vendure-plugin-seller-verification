@@ -10,6 +10,10 @@ export const adminSchema = gql`
 		sellerIds: [ID!]!
 		areVerified: Boolean!
 	}
+	type SellerInformationField{
+		fieldName: String!
+		fieldType: String!
+	}
 	extend type Mutation {
 		setSellerVerificationStatus(
 			input: SetSellerVerificationStatusInput!
@@ -18,5 +22,10 @@ export const adminSchema = gql`
 		setBulkSellerVerificationStatus(
 			input: SetBulkSellerVerificationStatusInput!
 		): Success
+
+		requestVerification(sellerInformation: JSON!, sellerId: ID!): Success!
+	}
+	extend type Query{
+		getSellerInformationFields: [SellerInformationField]!
 	}
 `;

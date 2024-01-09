@@ -12,7 +12,6 @@ import {
 	testConfig,
 } from "@vendure/testing";
 import { initialTestData } from "./initial-test-data";
-import { SellerVerifyPlugin } from "../dist";
 import { compileUiExtensions } from "@vendure/ui-devkit/compiler";
 import path from "path";
 import {
@@ -26,6 +25,7 @@ import {
 	Seller,
 } from "../src/ui/generated-admin-types";
 import { gql } from "graphql-tag";
+import { SellerVerifyPlugin } from "../src/sellerVerify.plugin";
 
 require("dotenv").config();
 
@@ -34,7 +34,10 @@ require("dotenv").config();
 	const devConfig = mergeConfig(testConfig, {
 		logger: new DefaultLogger({ level: LogLevel.Debug }),
 		plugins: [
-			SellerVerifyPlugin,
+			SellerVerifyPlugin.init({fields: [
+				{fieldName: "Bank Account", fieldType: "text"},
+				{fieldName: "Driving License", fieldType: "file"}
+			]}),
 			DefaultSearchPlugin,
 			AdminUiPlugin.init({
 				port: 3002,

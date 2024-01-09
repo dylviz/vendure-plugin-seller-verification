@@ -1,11 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { UpdateSellerInput } from "@vendure/common/lib/generated-types";
 import {
+	Asset,
+	AssetService,
 	ChannelService,
 	ID,
 	Permission,
 	RequestContext,
 	RoleService,
+	UserInputError,
 } from "@vendure/core";
 import { Seller } from "@vendure/core/dist/entity/seller/seller.entity";
 import { SellerService } from "@vendure/core/dist/service/services/seller.service";
@@ -14,8 +17,12 @@ import { SUPER_ADMIN_ROLE_CODE } from "@vendure/common/lib/shared-constants";
 import {
 	SetBulkSellerVerificationStatusInput,
 	SetSellerVerificationStatusInput,
+	VerifySellerPluginOptions,
 } from "../types";
 import { Success } from "../ui/generated-admin-types";
+import { Inject } from "@nestjs/common";
+import { SELLER_VERIFY_INIT_OPTIONS } from "../constants";
+
 export const additionalPermissions: Permission[] = [
 	Permission.CreateProduct,
 	Permission.ReadProduct,
@@ -30,18 +37,15 @@ export const additionalPermissions: Permission[] = [
 	Permission.UpdateAsset,
 	Permission.DeleteAsset,
 ];
-declare module "@vendure/core/dist/entity/custom-entity-fields" {
-	interface CustomSellerFields {
-		isVerified?: boolean;
-	}
-}
 
 @Injectable()
 export class SellerVerifyService {
 	constructor(
 		private sellerService: SellerService,
 		private channelService: ChannelService,
-		private roleService: RoleService
+		private roleService: RoleService,
+		private assetService: AssetService,
+		@Inject(SELLER_VERIFY_INIT_OPTIONS) private config: VerifySellerPluginOptions
 	) {}
 
 	/**
@@ -151,5 +155,33 @@ export class SellerVerifyService {
 			)
 		);
 		return { success: true };
+	}
+
+	async requestVerification(ctx: RequestContext,sellerInformation: any, sellerId: ID): Promise<Success>{
+		for(let field of this.config.fields){
+			if(!sellerInformation[field.fieldName]){
+				throw new UserInputError(`Required field "${field.fieldName}" of type "${field.fieldType}" not present`)
+			}
+			if(sellerInformation[field.fieldName] && field.fieldType === "file"){
+				const { createReadStream, filename, mimetype, stream } = await sellerInformation[field.fieldName];
+				console.log(createReadStream)
+				const newAssetOrError= await this.assetService.create(ctx, {file: sellerInformation[field.fieldName]})
+				if(newAssetOrError instanceof Asset){
+					sellerInformation[field.fieldName]=  {type: field.fieldType, value: newAssetOrError.id};
+				}else{
+					throw newAssetOrError;
+				}
+			}else{
+				sellerInformation[field.fieldName]=  {type: field.fieldType, value: sellerInformation[field.fieldName]}
+			}
+		}
+		const seller = await this.sellerService.findOne(ctx, sellerId);
+		if(seller){
+			seller.customFields.information= JSON.stringify(sellerInformation);
+			await this.sellerService.update(ctx, seller);
+			console.log('im here-------------------------------')
+			return {success: true}
+		}
+		throw new UserInputError(`Couldn't find seller with id ${sellerId}`)
 	}
 }
