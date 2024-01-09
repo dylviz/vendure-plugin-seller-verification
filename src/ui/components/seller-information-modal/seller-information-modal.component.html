@@ -1,0 +1,23 @@
+<ng-template vdrDialogTitle>Seller Information</ng-template>
+
+<form clrForm [formGroup]="formGroup" *ngIf="formGroup">
+    <clr-input-container
+        formArrayName="fields"
+        class="options-control"
+        *ngFor="let field of fields; let i = index"
+    >
+        <label>{{field.fieldName}}</label>
+        <input clrInput [type]="field.fieldType"  [name]="'field-' + i" [formControlName]="i"  disabled=""/>
+    </clr-input-container>
+</form>
+
+<ng-template vdrDialogButtons>
+  <button type="button"
+          class="btn"
+          (click)="cancel()">Cancel</button>
+  <button type="button"
+          [title]="isAlreadyVerified?'This Seller is verified':''"
+          class="btn btn-primary"
+          [disabled]="isAlreadyVerified"
+          (click)="verifySeller()">Verify</button>
+</ng-template>

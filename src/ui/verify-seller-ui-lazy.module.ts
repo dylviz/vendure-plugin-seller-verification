@@ -1,10 +1,9 @@
-import { NgModule, inject } from "@angular/core";
+import { NgModule } from "@angular/core";
 import { RouterModule } from "@angular/router";
-import { SharedModule, DataService } from "@vendure/admin-ui/core";
+import { SharedModule } from "@vendure/admin-ui/core";
 import { VerifySellerComponent } from "./components/seller-enable-disable/verify-seller.component";
-
-import { Observable, of } from "rxjs";
-import { map } from "rxjs/operators";
+import { SellerInformationModal } from "./components/seller-information-modal/seller-information-modal.component";
+import { SellerInformationCellComponent } from "./components/seller-information-cell/seller-information-cell.component";
 
 @NgModule({
 	imports: [
@@ -18,6 +17,6 @@ import { map } from "rxjs/operators";
 			},
 		]),
 	],
-	declarations: [VerifySellerComponent],
+	declarations: [VerifySellerComponent,SellerInformationModal,SellerInformationCellComponent],
 })
 export class VerifySellerUIModule {}

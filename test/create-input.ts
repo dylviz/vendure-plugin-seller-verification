@@ -3,6 +3,12 @@ import { LanguageCode } from '@vendure/core';
 export const createSellerInput= [
     {
         name: "Andy Murray",
+    },
+    {
+        name: "Daniel Michael",
+    },
+    {
+        name: "Soubern Sihul",
     }
 ] as CreateSellerInput[]
 
@@ -15,7 +21,25 @@ export const createChannelInput=[
         pricesIncludeTax: true,
         token: 'test-1-token',
         defaultCurrencyCode: CurrencyCode.USD
-    }
+    },
+    {
+        code: 'test-2',
+        defaultLanguageCode: LanguageCode.en,
+        defaultShippingZoneId: 1,
+        defaultTaxZoneId: 1,
+        pricesIncludeTax: true,
+        token: 'test-2-token',
+        defaultCurrencyCode: CurrencyCode.USD
+    },
+    {
+        code: 'test-3',
+        defaultLanguageCode: LanguageCode.en,
+        defaultShippingZoneId: 1,
+        defaultTaxZoneId: 1,
+        pricesIncludeTax: true,
+        token: 'test-3-token',
+        defaultCurrencyCode: CurrencyCode.USD
+    },
 ] as CreateChannelInput[]
 
 export const createRoleInput=[
@@ -28,5 +52,25 @@ export const createRoleInput=[
             Permission.UpdateGlobalSettings,
             Permission.DeleteCustomerGroup
         ]
-    }
+    },
+    {
+        code: 'test-2-admin',
+        description: 'role-2-description',
+        permissions: [
+            Permission.CreateAdministrator,
+            Permission.Authenticated,
+            Permission.UpdateGlobalSettings,
+            Permission.DeleteCustomerGroup
+        ]
+    },
+    {
+        code: 'test-3-admin',
+        description: 'role-3-description',
+        permissions: [
+            Permission.CreateAdministrator,
+            Permission.Authenticated,
+            Permission.UpdateGlobalSettings,
+            Permission.DeleteCustomerGroup
+        ]
+    },
 ] as CreateRoleInput[]
