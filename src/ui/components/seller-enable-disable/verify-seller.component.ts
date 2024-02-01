@@ -3,23 +3,18 @@ import {
 	ChangeDetectorRef,
 	Component,
 	OnInit,
-	OnDestroy,
 } from "@angular/core";
-import { FormBuilder, FormGroup } from "@angular/forms";
+import { FormBuilder, UntypedFormGroup, FormArray, FormControl, Validators } from "@angular/forms";
 import {
-	TypedBaseDetailComponent,
 	NotificationService,
 } from "@vendure/admin-ui/core";
-import { Observable, of } from "rxjs";
-import { map, filter } from "rxjs/operators";
+import { SellerInformationField } from "../../types";
+import { GET_SELLER_INFORMATION_FIELDS } from "../../queries";
+import { DataService } from '@vendure/admin-ui/core';
+import { GET_ACTIVE_CHANNEL, REQUEST_VERIFICATION } from "./verify-seller.graphql";
+import { ID } from "@vendure/core";
+import { forkJoin } from 'rxjs';
 
-import { SET_SELLER_VERIFICATION } from "./verify-seller.graphql";
-import {
-	SetSellerVerificationStatusDocument,
-	SetSellerVerificationStatusInput,
-	SetSellerVerificationStatusMutation,
-	SetSellerVerificationStatusMutationVariables,
-} from "../../generated-admin-types";
 
 @Component({
 	selector: "vdr-store-credit-detail",
@@ -28,87 +23,64 @@ import {
 	changeDetection: ChangeDetectionStrategy.Default,
 })
 export class VerifySellerComponent
-	extends TypedBaseDetailComponent<
-		typeof SetSellerVerificationStatusDocument,
-		keyof SetSellerVerificationStatusMutation
-	>
-	implements OnInit, OnDestroy
+	implements OnInit
 {
-	detailForm: FormGroup;
-	which = false;
+	detailForm: UntypedFormGroup;
+	fields: SellerInformationField[];
+	sellerInformation:any;
+	sellerId: ID;
 
 	constructor(
+		private dataService: DataService,
 		private formBuilder: FormBuilder,
 		private changeDetector: ChangeDetectorRef,
 		private notificationService: NotificationService
 	) {
-		super();
-		this.detailForm = this.formBuilder.group({
-			key: [""],
-			value: [],
-		});
+		
+		
 	}
 
 	ngOnInit() {
-		this.init();
-		//I think this is causing a small error
-		// if (this.router.url != "/extensions/store-credit/create") {
-		// 	this.which = false;
-		// 	this.init();
-		// } else {
-		// 	this.which = true;
-		// }
+		this.detailForm= this.formBuilder.group({fields: new FormArray([])});
+		const sellerInformartionFieldsObservable= this.dataService.query(GET_SELLER_INFORMATION_FIELDS).single$;
+		const activeChannelQueryObservable= this.dataService.query(GET_ACTIVE_CHANNEL).single$;
+		forkJoin([sellerInformartionFieldsObservable, activeChannelQueryObservable]).subscribe(
+			([sellerInformationFieldQueryResult, activeChannelQueryResult]) => {
+				const activeChannelSeller= (activeChannelQueryResult as any).activeChannel?.seller.customFields;
+				const sellerAlreadyVerified= activeChannelSeller.isVerified;
+				this.sellerInformation= JSON.parse(activeChannelSeller.information);
+				this.sellerId= (activeChannelQueryResult as any).activeChannel?.seller.id;
+				if((sellerInformationFieldQueryResult as any)?.getSellerInformationFields?.length){
+					this.fields= (sellerInformationFieldQueryResult as any).getSellerInformationFields
+				}else{
+					this.fields= []
+				}
+				this.detailForm= this.formBuilder.group({fields: new FormArray(this.fields.map((f:SellerInformationField)=> new FormControl({value: this.sellerInformation?.[f.fieldName]?.value??undefined, disabled: sellerAlreadyVerified}, Validators.required)))})
+				console.log(this.detailForm,'selam lalme')
+				this.changeDetector.markForCheck()
+			},
+			(error) => {
+			  console.error('Error:', error);
+			}
+		  );
 	}
 
-	ngOnDestroy() {
-		this.destroy();
-	}
-
-	update() {
-		this.saveChanges()
-			.pipe(filter((result) => !!result))
-			.subscribe({
-				next: (response) => {
-					this.detailForm.markAsPristine();
-					this.changeDetector.markForCheck();
-					this.notificationService.success("common.notify-update-success", {
-						entity: "Seller",
-					});
-				},
-				error: () => {
-					this.notificationService.error("common.notify-update-error", {
-						entity: "Seller",
-					});
-				},
-			});
-	}
-
-	private saveChanges(): Observable<boolean> {
-		if (this.detailForm.dirty) {
-			const formValue = this.detailForm.value;
-			const input: SetSellerVerificationStatusInput = {
-				sellerId: formValue.key,
-				isVerified: JSON.parse(formValue.value),
-			};
-
-			return this.dataService
-				.mutate<
-					SetSellerVerificationStatusMutation,
-					SetSellerVerificationStatusMutationVariables
-				>(SET_SELLER_VERIFICATION, {
-					input,
-				})
-				.pipe(map(() => true));
-		} else {
-			return of(false);
+	save() {
+		const rawData= this.detailForm.getRawValue().fields;
+		let data={}
+		for(let fieldIndex in this.fields){
+			const field= this.fields[fieldIndex].fieldName;
+			data[field as any]=rawData[fieldIndex];
 		}
+		this.dataService.mutate(REQUEST_VERIFICATION,{sellerInformation: data, sellerId: this.sellerId}).subscribe((response:any)=>{
+			if(response?.requestVerification?.success){
+				this.notificationService.success('Verification Request Sent')
+			}else{
+			    this.notificationService.error('Verification Request not sent')	
+			}
+			this.detailForm.markAsPristine()
+		})
 	}
 
-	protected setFormValues(entity: any) {
-		console.log(entity);
-		// this.detailForm.patchValue({
-		// 	key: entity.key,
-		// 	value: entity.value,
-		// });
-	}
+	
 }

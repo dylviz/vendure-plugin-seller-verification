@@ -7,6 +7,7 @@ import {
 import {
 	Permission,
 	Allow,
+	PermissionDefinition,
 	RequestContext,
 	Ctx,
 	Transaction,
@@ -20,6 +21,10 @@ import { Inject } from "@nestjs/common";
 import { SELLER_VERIFY_INIT_OPTIONS } from "../constants";
 import { SellerInformationField } from "src/ui/types";
 
+export const allowRequestVerificationPermission = new PermissionDefinition({
+	name: 'AllowRequestVerificationPermission',
+	description: 'Allow this user to enable invoice generation',
+  });
 @Resolver()
 export class AdminExtResolver {
 	constructor(private sellerVerifyService: SellerVerifyService, 
@@ -54,9 +59,9 @@ export class AdminExtResolver {
 
 	@Transaction()
 	@Mutation()
+	@Allow(allowRequestVerificationPermission.Permission)
 	async requestVerification(@Ctx() ctx: RequestContext,
 	@Args() args: { sellerInformation: JSON, sellerId:ID }):Promise<Success>{
-		console.log(args,'-------------------')
 		return this.sellerVerifyService.requestVerification(
 			ctx,
 			args.sellerInformation,
@@ -65,7 +70,7 @@ export class AdminExtResolver {
 	}
 
 	@Query()
-	@Allow(Permission.SuperAdmin)
+	@Allow(allowRequestVerificationPermission.Permission)
 	getSellerInformationFields():SellerInformationField[]{
 		return this.config.fields;
 	}

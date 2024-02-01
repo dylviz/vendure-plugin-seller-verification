@@ -1,48 +1,22 @@
 <vdr-page-header>
-	<vdr-page-title></vdr-page-title>
+	<div class="page-title">
+		<h1>Seller Information</h1>
+	</div>
+	<vdr-action-bar>
+		<vdr-ab-right>
+			<button
+				class="btn btn-primary"
+				(click)="save()"
+				[disabled]="(detailForm.invalid || detailForm.pristine)"
+			>
+				Request Verification
+			</button>
+		</vdr-ab-right>
+	</vdr-action-bar>
 </vdr-page-header>
 
 <vdr-page-body>
-	<form class="form" [formGroup]="detailForm">
-		<!-- <vdr-page-detail-layout>
-			<vdr-page-detail-sidebar>
-				<vdr-card *ngIf="entity$ | async as entity">
-					<vdr-page-entity-info [entity]="entity" />
-				</vdr-card>
-			</vdr-page-detail-sidebar>
-		</vdr-page-detail-layout> -->
-
-		<vdr-page-block>
-			<vdr-card>
-				<div class="form-grid">
-					<vdr-form-field label="Seller ID" for="key">
-						<input id="key" formControlName="key" />
-					</vdr-form-field>
-
-					<vdr-form-field label="Seller Status" for="value">
-						<select
-							id="value"
-							formControlName="value"
-							[disabled]="!'UpdateSettings'"
-						>
-							<option value="true">Enable</option>
-							<option value="false">Disable</option>
-						</select>
-					</vdr-form-field>
-
-					<div class="button-container">
-						<button
-							class="button"
-							(click)="update()"
-							[disabled]="
-								!detailForm.get('key')?.valid || !detailForm.get('value')?.valid
-							"
-						>
-							Update Seller Status
-						</button>
-					</div>
-				</div>
-			</vdr-card>
-		</vdr-page-block>
-	</form>
+	<vdr-page-block>
+		<seller-information [formGroup]="detailForm" [fields]="fields"></seller-information>
+	</vdr-page-block>
 </vdr-page-body>

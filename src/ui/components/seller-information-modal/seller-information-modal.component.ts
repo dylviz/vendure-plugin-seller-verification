@@ -19,6 +19,7 @@ import { SellerInformationField } from '../../types';
     isAlreadyVerified:boolean;
     sellerId: ID;
     formGroup: UntypedFormGroup;
+    readonly:boolean=true;
 
     constructor(private dataService: DataService, private formBuilder: FormBuilder, private ns:NotificationService){
 
@@ -26,7 +27,7 @@ import { SellerInformationField } from '../../types';
 
     ngOnInit(): void {
         const sellerInformation:{ [key: string]: string;}= JSON.parse(this.information);
-        this.formGroup= this.formBuilder.group({fields: new FormArray(this.fields.map((f:SellerInformationField)=> new FormControl(sellerInformation?.[f.fieldName]??"")))})
+        this.formGroup= this.formBuilder.group({fields: new FormArray(this.fields.map((f:SellerInformationField)=> new FormControl((sellerInformation?.[f.fieldName] as any)?.value??"")))})
     }
 
     cancel(){

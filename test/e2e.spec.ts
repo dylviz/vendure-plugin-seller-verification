@@ -19,17 +19,14 @@ import { testPaymentMethod } from "./test-payment-method";
 import { initialTestData } from "./initial-test-data";
 import {
 	Seller,
-	MutationCreateSellerArgs,
 } from "@vendure/common/lib/generated-types";
 import {
-	createSellerInput,
-	createChannelInput,
 	createRoleInput,
 } from "./create-input";
 import { gql } from "graphql-tag";
 import { additionalPermissions } from "../src/service/sellerverify.service";
 import { SellerInformationField } from "../src/ui/types";
-import { CREATE_CHANNEL, CREATE_ROLE, CREATE_SELLER, GET_ROLE, GET_SELLER_INFORMATION_FIELDS, REQUEST_VERIFICATION, sellerVerfifcationStatusQuery } from "./helpers";
+import { GET_ROLE, GET_SELLER_INFORMATION_FIELDS, REQUEST_VERIFICATION, sellerVerfifcationStatusQuery } from "./helpers";
 import path from "path";
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core';
 import { setContext } from '@apollo/client/link/context';
@@ -37,12 +34,11 @@ import { createUploadLink, Upload } from 'apollo-upload-client';
 import { ApolloLink } from '@apollo/client/core';
 import express from 'express';
 import {Stream} from 'stream';
+import { populateAdditionalData } from "./populate";
 describe("Seller Verifcation Plugin", function () {
 	let server: TestServer;
 	let adminClient: SimpleGraphQLClient;
-	let sellers: Seller[] = [];
-	let channels: Channel[] = [];
-	let roles: Role[] = [];
+	let sellers: Seller[], channels: Channel[], roles: Role[];
 	let verificationRequesteeSellerId;
 	const serverPort= 3106;
 	let sellerInformationFields: SellerInformationField[]=[
@@ -77,45 +73,7 @@ describe("Seller Verifcation Plugin", function () {
 			productsCsvPath: "./test/products.csv",
 			customerCount: 2,
 		});
-		await adminClient.asSuperAdmin();
-		//create additional Seller
-		for (let sellerInfo of createSellerInput) {
-			const { createSeller: newSeller } = await adminClient.query<
-				{ createSeller: Seller },
-				MutationCreateSellerArgs
-			>(
-				CREATE_SELLER,
-				{ input: { name: sellerInfo.name } }
-			);
-			sellers.push(newSeller);
-		}
-		verificationRequesteeSellerId= sellers[sellers.length-1].id;
-		//create additional Channel associated with new Seller
-		for (let createChannelIndex in createChannelInput) {
-			const { createChannel: newChannel } = await adminClient.query(
-				CREATE_CHANNEL,
-				{
-					input: {
-						...createChannelInput[createChannelIndex],
-						sellerId: sellers[createChannelIndex].id,
-					},
-				}
-			);
-			channels.push(newChannel);
-		}
-		//Create Role associated with the new Channel
-		for (let roleIndex in createRoleInput) {
-			const { createRole } = await adminClient.query(
-				CREATE_ROLE,
-				{
-					input: {
-						...createRoleInput[roleIndex],
-						channelIds: channels[roleIndex].id,
-					},
-				}
-			);
-			roles.push(createRole);
-		}
+		[sellers,channels,roles,]= await populateAdditionalData(adminClient)
 		server.app.use(express.json({limit: '50mb'}));
 		server.app.use(express.urlencoded({limit: '50mb'}));
 	}, 60000);
@@ -276,82 +234,5 @@ describe("Seller Verifcation Plugin", function () {
 		  expect(response.data.requestVerification.success).toBe(true);
 	})
 
-	it.skip('Should request verification', async()=>{
-		let sellerInformation={};
-		const someGeneralText= "Hi There!";
-		const someGeneralNumber=100;
-		const filename= "test-file.png"
-		const fs = require('fs').promises;
-		const filePath = path.join(__dirname, filename);
-		// const fileContent = fs.readFileSync(filePath);
-		// const boundary = generateBoundary();
-  		// const formData = new FormData();
-		for(let field of sellerInformationFields){
-			if(field.fieldType === "file"){
-				sellerInformation[field.fieldName] = await fs.open(filePath)
-				// formData.append(field.fieldName,  fs.readFileSync(filePath));
-			}
-			else if(field.fieldType === "number"){
-				//some general text
-				sellerInformation[field.fieldName] = someGeneralNumber;
-				// formData.append(field.fieldName,  `${someGeneralNumber}`);
-			}
-			else if(field.fieldType === "text"){
-				//some general text
-				sellerInformation[field.fieldName] = someGeneralText;
-				// formData.append(field.fieldName,  `${someGeneralText}`);
-			}else{
-				throw new Error(`Unexpected seller information field "${field.fieldName}"`)
-			}
-		}
-		const YOUR_GRAPHQL_ENDPOINT=`http://localhost:${serverPort}/admin-api`;
-		const boundary= generateBoundary()
-		// const headers = formData.getHeaders();
-		// const boundary = headers['content-type'].split('boundary=')[1];
-		const json= addBoundaries(sellerInformation, boundary);
-		console.log(json)
-		const payload = {
-			method: 'POST',
-			headers: {
-			  // Include any required headers here
-			  // For file uploads, set Content-Type to "multipart/form-data"
-			  'Content-Type': `multipart/form-data; boundary=${boundary}`,
-			  // 'Content-Type': `application/json`,
-			  'Authorization': `Bearer  ${adminClient.getAuthToken()}`
-			},
-			body: JSON.stringify({
-			  query: REQUEST_VERIFICATION,
-			  variables:{sellerInformation: json, sellerId: verificationRequesteeSellerId },
-			}),
-		  };
-		  try{
-		  const response = await fetch(YOUR_GRAPHQL_ENDPOINT, payload);
-		  const data = await response.json();
-		  console.log(data,'----------------------')
-		  expect(data?.requestVerification?.success).toBe(true);
-		  }catch(e){ 
-			console.error('Error:', e.message);
-			expect(0, e.message).toBe(1);
-		  }
-	})
-
-	const addBoundaries=(formData:any, boundary: string)=>{
-		let body = '';
-
-		for (const key in formData) {
-			if (formData.hasOwnProperty(key)) {
-				let value = formData[key];
-				body += `--${boundary}\r\n`;
-				body += `Content-Disposition: form-data; name="${key}"\r\n\r\n${value}\r\n`;
-			}
-		}
-
-		body += `--${boundary}--\r\n`;
-
-		return body;
-	}
-
-	const generateBoundary = () => {
-		return '-------------------------' + Math.random().toString(36).substring(2);
-	};
+	
 });

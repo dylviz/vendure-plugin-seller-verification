@@ -1,15 +1,6 @@
 <ng-template vdrDialogTitle>Seller Information</ng-template>
 
-<form clrForm [formGroup]="formGroup" *ngIf="formGroup">
-    <clr-input-container
-        formArrayName="fields"
-        class="options-control"
-        *ngFor="let field of fields; let i = index"
-    >
-        <label>{{field.fieldName}}</label>
-        <input clrInput [type]="field.fieldType"  [name]="'field-' + i" [formControlName]="i"  disabled=""/>
-    </clr-input-container>
-</form>
+<seller-information [formGroup]="formGroup" [fields]="fields"></seller-information>
 
 <ng-template vdrDialogButtons>
   <button type="button"

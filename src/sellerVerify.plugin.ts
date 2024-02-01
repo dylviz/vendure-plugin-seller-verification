@@ -1,12 +1,13 @@
 import { InternalServerError, LanguageCode, PluginCommonModule, VendurePlugin } from "@vendure/core";
 import { adminSchema } from "./api/api-extensions";
-import { AdminExtResolver } from "./api/adminExt.resolver";
+import { AdminExtResolver, allowRequestVerificationPermission } from "./api/adminExt.resolver";
 import { SellerVerifyService } from "./service/sellerverify.service";
 import { AdminUiExtension } from "@vendure/ui-devkit/compiler";
 import path from "path";
 import { VerifySellerPluginOptions } from "./types";
 import { SELLER_VERIFY_INIT_OPTIONS } from "./constants";
 import { SellerInformationField } from "./ui/types";
+import { SellerCustomFieldsResolver } from "./api/seller.custom-field.resolver";
 
 function hasUniqueValues(arr: SellerInformationField[], fieldName: keyof SellerInformationField): boolean {
 	const uniqueValues = new Set();
@@ -36,7 +37,7 @@ function hasUniqueValues(arr: SellerInformationField[], fieldName: keyof SellerI
 		}
 	],
 	adminApiExtensions: {
-		resolvers: [AdminExtResolver],
+		resolvers: [AdminExtResolver, SellerCustomFieldsResolver],
 		schema: adminSchema,
 	},
 	configuration: (config) => {
@@ -73,7 +74,7 @@ function hasUniqueValues(arr: SellerInformationField[], fieldName: keyof SellerI
 				},
 			],
 		});
-
+		config.authOptions.customPermissions.push(allowRequestVerificationPermission);
 		return config;
 	},
 })

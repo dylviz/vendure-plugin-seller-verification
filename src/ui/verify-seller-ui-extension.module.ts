@@ -2,6 +2,7 @@ import { NgModule } from "@angular/core";
 import {
 	SharedModule,
 	addNavMenuSection,
+	addNavMenuItem,
 	registerBulkAction,
 	registerDataTableComponent
 } from "@vendure/admin-ui/core";
@@ -15,23 +16,14 @@ import { SellerInformationCellComponent } from "./components/seller-information-
 @NgModule({
 	imports: [SharedModule],
 	providers: [
-		addNavMenuSection(
-			{
-				id: "verify-seller-nav",
-				label: "Verify Seller",
-				items: [
-					{
-						id: "verify-seller",
-						label: "Verify Seller",
-						routerLink: ["/extensions/verify-seller"],
-						icon: "folder-open",
-					},
-				],
-				requiresPermission: "SuperAdmin",
-			},
-			// Add this section before the "settings" section
-			"settings"
-		),
+		addNavMenuItem({
+			id: 'request-verification',
+			label: 'Request Verification',
+			routerLink: ['/extensions/verify-seller'],
+			icon: 'folder-ope',
+			requiresPermission:'AllowRequestVerificationPermission'
+		},
+		'settings'),
 		registerBulkAction({
 			location: "seller-list",
 			label: "Enable Selected Seller(s)",

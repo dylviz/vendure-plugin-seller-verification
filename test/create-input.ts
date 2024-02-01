@@ -1,5 +1,7 @@
 import { CreateSellerInput, CreateChannelInput,CreateRoleInput, Permission, CurrencyCode} from '@vendure/common/lib/generated-types';
 import { LanguageCode } from '@vendure/core';
+import { CreateAdministratorInput } from '../src/ui/generated-admin-types';
+import { allowRequestVerificationPermission } from '../src/api/adminExt.resolver';
 export const createSellerInput= [
     {
         name: "Andy Murray",
@@ -50,7 +52,12 @@ export const createRoleInput=[
             Permission.CreateAdministrator,
             Permission.Authenticated,
             Permission.UpdateGlobalSettings,
-            Permission.DeleteCustomerGroup
+            Permission.DeleteCustomerGroup,
+            allowRequestVerificationPermission.Permission,
+            Permission.ReadTag,
+            Permission.CreateAsset,
+            Permission.ReadAsset,
+            Permission.ReadSeller,
         ]
     },
     {
@@ -60,7 +67,12 @@ export const createRoleInput=[
             Permission.CreateAdministrator,
             Permission.Authenticated,
             Permission.UpdateGlobalSettings,
-            Permission.DeleteCustomerGroup
+            Permission.DeleteCustomerGroup,
+            allowRequestVerificationPermission.Permission,
+            Permission.ReadTag,
+            Permission.CreateAsset,
+            Permission.ReadAsset,
+            Permission.ReadSeller,
         ]
     },
     {
@@ -70,7 +82,33 @@ export const createRoleInput=[
             Permission.CreateAdministrator,
             Permission.Authenticated,
             Permission.UpdateGlobalSettings,
-            Permission.DeleteCustomerGroup
+            Permission.DeleteCustomerGroup,
+            allowRequestVerificationPermission.Permission,
+            Permission.ReadTag,
+            Permission.CreateAsset,
+            Permission.ReadAsset,
+            Permission.ReadSeller,
         ]
     },
 ] as CreateRoleInput[]
+
+export const createAdministratorInput:Omit<CreateAdministratorInput,'roleIds'>[]=[
+    {
+        emailAddress: 'test-1@gmail.com',
+        firstName: 'Test 1',
+        lastName: 'Administrator',
+        password: 'test'
+    },
+    {
+        emailAddress: 'test-2@gmail.com',
+        firstName: 'Test 2',
+        lastName: 'Administrator',
+        password: 'test'
+    },
+    {
+        emailAddress: 'test-3@gmail.com',
+        firstName: 'Test 3',
+        lastName: 'Administrator',
+        password: 'test'
+    }
+]

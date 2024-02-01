@@ -163,14 +163,8 @@ export class SellerVerifyService {
 				throw new UserInputError(`Required field "${field.fieldName}" of type "${field.fieldType}" not present`)
 			}
 			if(sellerInformation[field.fieldName] && field.fieldType === "file"){
-				const { createReadStream, filename, mimetype, stream } = await sellerInformation[field.fieldName];
-				console.log(createReadStream)
-				const newAssetOrError= await this.assetService.create(ctx, {file: sellerInformation[field.fieldName]})
-				if(newAssetOrError instanceof Asset){
-					sellerInformation[field.fieldName]=  {type: field.fieldType, value: newAssetOrError.id};
-				}else{
-					throw newAssetOrError;
-				}
+				const assetId = sellerInformation[field.fieldName]["id"];
+				sellerInformation[field.fieldName]=  {type: field.fieldType, value: assetId};
 			}else{
 				sellerInformation[field.fieldName]=  {type: field.fieldType, value: sellerInformation[field.fieldName]}
 			}
@@ -178,8 +172,8 @@ export class SellerVerifyService {
 		const seller = await this.sellerService.findOne(ctx, sellerId);
 		if(seller){
 			seller.customFields.information= JSON.stringify(sellerInformation);
+			seller.customFields.requestesVerification= true;
 			await this.sellerService.update(ctx, seller);
-			console.log('im here-------------------------------')
 			return {success: true}
 		}
 		throw new UserInputError(`Couldn't find seller with id ${sellerId}`)

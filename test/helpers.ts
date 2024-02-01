@@ -1,5 +1,24 @@
 import { gql } from "graphql-tag";
 
+export const ADMINISTRATOR_FRAGMENT = gql`
+    fragment Administrator on Administrator {
+        id
+        firstName
+        lastName
+        emailAddress
+        user {
+            id
+            identifier
+            lastLogin
+            roles {
+                id
+                code
+                description
+                permissions
+            }
+        }
+    }
+`;
 export const GET_SELLER_INFORMATION_FIELDS=gql`
     query GetSellerInformationFieldsQuery{
         getSellerInformationFields{
@@ -72,3 +91,12 @@ export const REQUEST_VERIFICATION=`
         }
     }
 `
+
+export const CREATE_ADMINISTRATOR = gql`
+    mutation CreateAdministrator($input: CreateAdministratorInput!) {
+        createAdministrator(input: $input) {
+            ...Administrator
+        }
+    }
+    ${ADMINISTRATOR_FRAGMENT}
+`;

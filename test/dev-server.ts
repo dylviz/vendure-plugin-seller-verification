@@ -3,6 +3,7 @@ import {
 	DefaultLogger,
 	DefaultSearchPlugin,
 	LogLevel,
+	Role,
 	mergeConfig,
 } from "@vendure/core";
 import {
@@ -14,18 +15,8 @@ import {
 import { initialTestData } from "./initial-test-data";
 import { compileUiExtensions } from "@vendure/ui-devkit/compiler";
 import path from "path";
-import {
-	createChannelInput,
-	createRoleInput,
-	createSellerInput,
-} from "./create-input";
-import {
-	Channel,
-	MutationCreateSellerArgs,
-	Seller,
-} from "../src/ui/generated-admin-types";
-import { gql } from "graphql-tag";
 import { SellerVerifyPlugin } from "../src/sellerVerify.plugin";
+import { populateAdditionalData } from "./populate";
 
 require("dotenv").config();
 
@@ -60,68 +51,5 @@ require("dotenv").config();
 		initialData: initialTestData,
 		productsCsvPath: "./test/products.csv",
 	});
-	await adminClient.asSuperAdmin();
-	let sellers: Seller[] = [];
-	let channels: Channel[] = [];
-	// create additional Sellers
-	for (let sellerInfo of createSellerInput) {
-		const { createSeller: newSeller } = await adminClient.query<
-			{ createSeller: Seller },
-			MutationCreateSellerArgs
-		>(
-			gql`
-				mutation CreateSellerMutation($input: CreateSellerInput!) {
-					createSeller(input: $input) {
-						id
-						name
-					}
-				}
-			`,
-			{ input: { name: sellerInfo.name } }
-		);
-		sellers.push(newSeller);
-	}
-	//create additional Channel associated with new Seller
-	for (let createChannelIndex in createChannelInput) {
-		const { createChannel: newChannel } = await adminClient.query(
-			gql`
-				mutation CreateChannelQuery($input: CreateChannelInput!) {
-					createChannel(input: $input) {
-						... on Channel {
-							code
-							id
-						}
-					}
-				}
-			`,
-			{
-				input: {
-					...createChannelInput[createChannelIndex],
-					sellerId: sellers[createChannelIndex].id,
-				},
-			}
-		);
-		channels.push(newChannel);
-	}
-	//Create Role associated with the new Channel
-	for (let roleIndex in createRoleInput) {
-		await adminClient.query(
-			gql`
-				mutation CreateRoleMutation($input: CreateRoleInput!) {
-					createRole(input: $input) {
-						id
-						code
-						description
-						permissions
-					}
-				}
-			`,
-			{
-				input: {
-					...createRoleInput[roleIndex],
-					channelIds: channels[roleIndex].id,
-				},
-			}
-		);
-	}
+	await populateAdditionalData(adminClient)
 })();
