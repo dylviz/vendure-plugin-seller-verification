@@ -1,0 +1,20 @@
+<form clrForm [formGroup]="formGroup" *ngIf="formGroup">
+    <ng-container *ngFor="let field of fields; let i = index" formArrayName="fields">
+        <clr-input-container
+            class="options-control form-row"
+            *ngIf="field.fieldType !== 'file'" 
+        >
+            <label>{{field.fieldName}}</label>
+            <input clrInput [type]="field.fieldType"  [name]="'field-' + i" [formControlName]="i"/>
+        </clr-input-container>
+        <clr-control-container *ngIf="field.fieldType === 'file'" class="form-row">
+            <label>{{field.fieldName}}</label>
+            <vdr-assets
+                [assets]="getAssets(i)"
+                [featuredAsset]="getAsset(i)"
+                [updatePermissions]="getUpdatePermissions()"
+                (change)="updateFormControlWithAsset($event, i)"
+            ></vdr-assets>
+        </clr-control-container>
+    </ng-container>
+</form>
