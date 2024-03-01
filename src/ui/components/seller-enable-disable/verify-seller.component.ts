@@ -57,7 +57,6 @@ export class VerifySellerComponent
 					this.fields= []
 				}
 				this.detailForm= this.formBuilder.group({fields: new FormArray(this.fields.map((f:SellerInformationField)=> new FormControl({value: this.sellerInformation?.[f.fieldName]?.value??undefined, disabled: sellerAlreadyVerified}, Validators.required)))})
-				console.log(this.detailForm.controls,'selam lalme', this.fields)
 				this.changeDetector.markForCheck()
 			},
 			error: (e) => console.error(e),

@@ -34,8 +34,6 @@ export class SellerInformationCellComponent implements CustomColumnComponent, On
       isAlreadyVerified: this.rowItem.customFields.isVerified,
       sellerId: this.rowItem.id,
       information: this.rowItem.customFields.information
-    }}).subscribe((data)=>{
-      console.log(data);
-    })
+    }}).subscribe()
   }
 }

@@ -164,7 +164,6 @@ describe("Seller Verifcation Plugin", function () {
 				throw new Error(`Unexpected seller information field "${field.fieldName}"`)
 			}
 		}
-		console.log(formData)
 		// formData.append('sellerInformation', sellerInformation);
 		const response = await request(`http://localhost:${serverPort}/admin-api`, REQUEST_VERIFICATION, formData, {
 			headers: {'Content-Type':'multipart/form-data', 'Authorization': `Bearer ${adminClient.getAuthToken()}`},

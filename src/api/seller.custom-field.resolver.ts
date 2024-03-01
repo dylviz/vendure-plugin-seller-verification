@@ -22,7 +22,6 @@ export class SellerCustomFieldsResolver {
             const field= fields[fieldIndex];
             if(field.fieldType === 'file'){
                 const assetId= sellerInformation[field.fieldName].value;
-                console.log(assetId,'assetId')
                 sellerInformation[field.fieldName].value= await this.assetService.findOne(ctx,this.parseTestID(assetId));
             }
         }
