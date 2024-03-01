@@ -1,4 +1,4 @@
-<form clrForm [formGroup]="formGroup" *ngIf="formGroup">
+<form clrForm [formGroup]="formGroup">
     <ng-container *ngFor="let field of fields; let i = index" formArrayName="fields">
         <clr-input-container
             class="options-control form-row"

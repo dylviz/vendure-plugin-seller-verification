@@ -4,7 +4,7 @@ import {
 	Component,
 	OnInit,
 } from "@angular/core";
-import { FormBuilder, UntypedFormGroup, FormArray, FormControl, Validators } from "@angular/forms";
+import { FormBuilder, UntypedFormGroup, FormArray, FormControl, Validators,FormGroup } from "@angular/forms";
 import {
 	NotificationService,
 } from "@vendure/admin-ui/core";
@@ -44,8 +44,9 @@ export class VerifySellerComponent
 		this.detailForm= this.formBuilder.group({fields: new FormArray([])});
 		const sellerInformartionFieldsObservable= this.dataService.query(GET_SELLER_INFORMATION_FIELDS).single$;
 		const activeChannelQueryObservable= this.dataService.query(GET_ACTIVE_CHANNEL).single$;
-		forkJoin([sellerInformartionFieldsObservable, activeChannelQueryObservable]).subscribe(
-			([sellerInformationFieldQueryResult, activeChannelQueryResult]) => {
+		forkJoin([sellerInformartionFieldsObservable, activeChannelQueryObservable])
+		.subscribe({
+			next: ([sellerInformationFieldQueryResult, activeChannelQueryResult]) => {
 				const activeChannelSeller= (activeChannelQueryResult as any).activeChannel?.seller.customFields;
 				const sellerAlreadyVerified= activeChannelSeller.isVerified;
 				this.sellerInformation= JSON.parse(activeChannelSeller.information);
@@ -56,13 +57,12 @@ export class VerifySellerComponent
 					this.fields= []
 				}
 				this.detailForm= this.formBuilder.group({fields: new FormArray(this.fields.map((f:SellerInformationField)=> new FormControl({value: this.sellerInformation?.[f.fieldName]?.value??undefined, disabled: sellerAlreadyVerified}, Validators.required)))})
-				console.log(this.detailForm,'selam lalme')
+				console.log(this.detailForm.controls,'selam lalme', this.fields)
 				this.changeDetector.markForCheck()
 			},
-			(error) => {
-			  console.error('Error:', error);
-			}
-		  );
+			error: (e) => console.error(e),
+			complete: () => console.info('complete') 
+		})
 	}
 
 	save() {
